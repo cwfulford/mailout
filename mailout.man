@@ -1,0 +1,99 @@
+.TH MAILOUT 8l "20 November r
+.SH NAME
+.B mailout
+- sends personalised html email to a number of recipients.
+.SH SYNOPSIS
+\fBmailout\fR [\fB-c \fI<config_file>\fR] [\fB-d\fR]
+[\fB-n \fI# records\fR] [\fB-t\fR] [\fB-v\fR] [\fB-x\fR]
+[\fB-X \fI<exclude_file>\fR]
+[\fI<message_file>\fR]
+.SH AVAILABILITY
+.B mailout
+is a Bourne shell script and should work equally well on all versions of UNIX,
+Linux and Mac OS X.
+.SH DESCRIPTION
+The script
+.B mailout 
+extracts names and email addresses from a csv data file and uses
+.B awk
+to generate personalised html email to each recipient in the list.
+.B Sendmail
+is is used as the \fIMUA\fR and the \fI"from"\fR address is set in the
+script.
+.LP
+If the 
+.B -n 
+option is used (see options below) the number of emails may be restricted.
+.LP
+The script keeps track of the recipients to whom the message has been sent
+and the next time it is run skips those records and sends messages 
+to new addresses only.
+.LP
+The default data file is \fI/var/mailout/data.csv\fR. This may be changed
+in the configuration file.
+.LP
+The default message file is \fI/var/mailout/msg\fR but this is normally 
+changed by specifying the file on the command line. \fIMailout\fR does not
+care if the message is in html format or not.
+.SH OPTIONS
+.TP 5
+\fB-c \fI<config_file>\fR
+The default configuration file is \fI/usr/local/etc/mailout.cf\fR, this
+may be changed on the command line by using the \fB-c\fR option.
+.TP 5
+.B -d
+Set \fIdebug\fR mode on. The script will report its progress to screen
+as it runs. 
+.TP 5
+.B -t
+Sets \fItest\fR mode. The script runs through all its usual actions and reports
+recipient details as it would normally but the email is actually sent to a 
+single email address under the control of the user. This is to allow
+verification by inspection of the resulting message content.
+.TP 5
+.B -v
+Set the operation mode of the script to 
+.IR verbose .
+In
+.I verbose
+mode \fBmailout\fR will echo to screen the recipient details for each
+message sent.
+.TP 5
+.B -x
+With the \fB-x\fR option set the recipients that would otherwise be contacted
+are extracted and reported to screen but no mail is sent. This is useful
+where is desirable to to check the potential recipients or cross reference
+with other mailouts before committing to sending the message.
+.TP 5
+\fB-X \fI<exclude_file>\fR
+The \fB-X\fR option allows an exclude file to be specified on the command line.
+The default exclude file is \fI/usr/local/etc/mailout.xcld\fR, although this
+may be changed using the configuration file. The exclude files are lists of mail
+addresses and mail domains to which mail should not be sent. Both files will
+be consulted if the \fB-X \fI<exclude_file>\fR option is used.
+
+.SH EXAMPLES
+.IP
+.nf
+.ft CW
+mailout -n 20 -v  ad010429.html
+.fi
+.ft R
+.LP
+Send personalised email using the file ad010429.html to the next 20
+recipients from the \fI/var/mailout/data.csv\fR.
+.LP
+List the recipients to screen as each email is sent.
+.SH BUGS
+Not really bugs but the script has very little input error checking.
+.LP
+The fields for the recipient names and email addresses are hardwired
+as are the strings that are to be substituted in the message file, ie. 
+\fI"rcpt"\fR and "\fIfirstname\fR".
+.LP
+The \fIfrom\fR address is also hardwired.
+.SH FILES
+.IR /usr/local/mailout.cf ,
+.IR /usr/local/mailout.xcld .
+.SH AUTHOR
+Clifford W Fulford, City Linux. Contact fulford@fulford.net or +44 (0)709 229 5385.

@@ -1,0 +1,155 @@
+# $Id: mailout,v 1.36 2015/03/03 14:52:32 fulford Exp $
+# $Source: /src/merlin/usr/local/etc/RCS/mailout,v $
+# $Revision: 1.36 $
+# $Date: 2015/03/03 14:52:32 $
+# Copyright (c) 2013 Clifford W Fulford.
+# Licensed for public use under the LGPL.
+# For assistance contact fulford@fulford.net 0709 229 5385
+####################################################################
+cmd=`basename $0`
+syntax="$cmd [-d(ebug)] [-n <#records>] [-t(est) [-v] [-x] <message_file> [-X exclude_file]" 
+while [ $# -gt 0 ];do
+	case $1 in
+	       -c) config=$2;shift 2;;
+	       -d) debug=:;set -x; shift;;
+	       -n) r=$2;shift 2;; #set number of records to be used
+	       -t) test=:;shift;;
+	       -v) verbose=: ;shift ;;
+	       -x) xtract=:;shift;;
+	       -X) Xcld=$2;shift 2;;
+	       -*) echo "syntax: $syntax" >&2 ;exit;; 
+	        *) clmsg=$1;shift;;
+	esac
+done
+if [ -n "$Xcld" ];then
+	if [ -f "$Xcld" ];then
+		[ `wc -m $Xclude` -lt 2 ] &&{
+			[ "$verbose" ]&&{
+				echo "$cmd: Nothing useful in $Xcld">&2
+			}
+		}
+	else 
+	 	echo "$cmd: Can't find $Xcld" >&2
+	 	exit 1
+	fi
+fi
+config=${config:-"/usr/local/etc/mailout.cf"}
+. $config
+[ -n "$clmsg" ]&& msg=$clmsg
+data=${data:-/var/mailout/data.csv} #default data file
+debug=${debug:-""}
+if [ -n "$exclude" ];then
+	[ -f $exclude ] || sudo touch $exclude
+fi 
+head=/home/fulford/fulford/ads/flare/head
+msg=${msg:-/var/mailout/msg} #default message
+[ $debug ] && echo "message file = $msg" >&2
+r=${r:-1}
+test=${test:-""}
+email=/tmp/mailout/msg
+verbose=${verbose:-""}
+xtract=${xtract:-""}
+logdir=/var/log/mailout
+[ $debug ] && { set >&2;read ;}
+
+# if log directory doesn't exist create it.
+[ -d  $logdir ] || { sudo mkdir  $logdir ;sudo chmod g+w $logdir ;}
+log=$logdir/`basename $msg`
+
+# if directory for temporary files doesn't exist create it.
+tdir=`dirname $email`
+[ -d $tdir ] ||{ mkdir $tdir;sudo chmod g+w $tdir ;}
+
+# if log doesn't exist create it.
+[ -f $log ] || touch $log
+
+# check data and message files are readable
+if [ ! -r "$data" -o ! -r "$msg" ];then
+	[ ! -r "$data" ] && echo "$cmd: data file $data not found" >&2
+	[ ! -r "$msg" ] && {
+		echo "$cmd: message file $msg not found" >&2
+	 	echo "Set a message file in $config or on command line" >&2
+	}
+	echo "syntax: $syntax" >&2
+	exit 1
+fi
+[ $debug ] && { echo "$data & $msg found">&2; read ;}
+gawk -v r=$r -v test=$test -v verbose=$verbose -v debug=$debug -v r=$r -v xtract=$xtract   -F, '{ 
+	if($1 !~ /Authority/ && r > 0 && $1 !~ /^#/){
+		if(debug) print "count = " r >"/dev/stderr"
+			
+		# assign unmodified mail address to rcpt
+		rcpt=$5
+		# quote any single quotes in original name for grep
+		gsub("\x27","\\\x27",$5)
+
+		# Check if recipient opted out	
+		cmd="grep -c "$5" '$exclude' '$Xclude'"
+		if(debug) print cmd >"/dev/stderr"
+		print cmd |& ("/bin/sh")
+		("/bin/sh") |& getline result
+		close ("/bin/sh")
+		#If found quit and start next iteration
+		if(result >= 1){
+			if(debug) print $5 " found, next" >"/dev/stderr"
+			next
+		}
+
+		# Check if domain excluded in exclude files
+		domain=$5
+		sub(".*@","",domain)
+		cmd="grep -c ^"domain" '$exclude' '$Xclude'"
+		if(debug) print cmd >"/dev/stderr"
+		print cmd |& ("/bin/sh")
+		("/bin/sh") |& getline result
+		close ("/bin/sh")
+		if(result >= 1){
+			if(verbose) print domain "is excluded">"/dev/stderr"
+			next
+		}
+		#Check if message already sent -c returns number of times found
+		cmd="grep -c "$5" '$log'"
+		if(debug) print cmd >"/dev/stderr"
+		print cmd |& ("/bin/sh")
+		("/bin/sh") |& getline result
+		close ("/bin/sh")
+		#If found quit and start next iteration
+		if(result >= 1){
+			if(debug) print $5 " found, next" >"/dev/stderr"
+			next
+		}
+		if(verbose && xtract) print $5 
+		split($2,n," ")
+		if(n[2] == "")n[2]="Dear Colleague"
+		#print "n[2]=" n[2]
+		if(test) rcpt="fulfordcw@gmail.com"  
+		if(debug) print rcpt >"/dev/stderr"
+		system(">'$email'")
+		close(">'$email'")
+		while ((getline msg <"'$head'" ) > 0){
+			# mailmerge email address into header
+			gsub("<rcpt>",rcpt,msg)
+			print msg >>"'$email'"
+		} close("'$head'")
+		while ((getline msg <"'$msg'" ) > 0){
+			gsub("<firstname>",n[2],msg)
+			print msg >>"'$email'"
+		} close("'$msg'")
+		#cmd="mailx -s \"Flare support\" -rfulford@flare-support.co.uk -b fulford@fulford.net "rcpt"<'$email'"
+		if(debug) cmd="sudo sendmail -vt -ffulford@flare-support.co.uk -C/etc/mail/sendmail-flare.cf <'$email'"
+		else  cmd="sudo sendmail -t -C/etc/mail/sendmail-flare.cf -ffulford@flare-support.co.uk <'$email'"
+		if(debug) print "mailout = "cmd  >"/dev/stderr"
+		if(! xtract) print cmd |"/bin/sh" 
+		retval = close("/bin/sh")
+		#print "retval = " retval
+		if(! xtract) print rcpt,systime() >> "'$log'"
+		if(verbose && ! xtract) print r," ", rcpt 
+		if(debug){system("read");close("read")}
+		if(xtract){ print r," ", rcpt
+			}else{system("/usr/bin/sleep 2")
+			close("/usr/bin/sleep 2")
+		}
+		r=r - 1
+	}
+}' $data 
+
