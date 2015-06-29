@@ -1,7 +1,7 @@
-# $Id: mailout,v 1.37 2015/06/25 23:11:11 fulford Exp $
+# $Id: mailout,v 1.38 2015/06/29 11:55:07 fulford Exp fulford $
 # $Source: /src/merlin/usr/local/etc/RCS/mailout,v $
-# $Revision: 1.37 $
-# $Date: 2015/06/25 23:11:11 $
+# $Revision: 1.38 $
+# $Date: 2015/06/29 11:55:07 $
 # Copyright (c) 2013 Clifford W Fulford.
 # Licensed for public use under the LGPL.
 # For assistance contact fulford@fulford.net 0709 229 5385
@@ -47,6 +47,7 @@ debug=${debug:-""}
 if [ -n "$exclude" ];then
 	[ -f $exclude ] || sudo touch $exclude
 fi 
+boundary="FS_/`date +%s`.`basename $msg`"
 head=/home/fulford/fulford/ads/flare/head
 msg=${msg:-/var/mailout/msg} #default message
 [ $debug ] && echo "message file = $msg" >&2
@@ -134,6 +135,7 @@ gawk -v r=$r -v test=$test -v verbose=$verbose -v debug=$debug -v r=$r -v xtract
 		close(">'$email'")
 		while ((getline msg <"'$head'" ) > 0){
 			# mailmerge email address into header
+			gsub("<boundary>",boundary,msg)
 			gsub("<rcpt>",rcpt,msg)
 			print msg >>"'$email'"
 		} close("'$head'")
