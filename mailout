@@ -1,7 +1,7 @@
-# $Id: mailout,v 1.42 2015/06/29 19:01:14 fulford Exp fulford $
+# $Id: mailout,v 1.43 2015/06/29 19:06:56 fulford Exp fulford $
 # $Source: /src/merlin/usr/local/etc/RCS/mailout,v $
-# $Revision: 1.42 $
-# $Date: 2015/06/29 19:01:14 $
+# $Revision: 1.43 $
+# $Date: 2015/06/29 19:06:56 $
 # Copyright (c) 2013 Clifford W Fulford.
 # Licensed for public use under the LGPL.
 # For assistance contact fulford@fulford.net 0709 229 5385
@@ -47,7 +47,7 @@ debug=${debug:-""}
 if [ -n "$exclude" ];then
 	[ -f $exclude ] || sudo touch $exclude
 fi 
-boundary="FS_/`date +%s`.`basename $msg`"
+boundary=FS_`date +%s`.`basename $msg`
 head=/home/fulford/fulford/ads/flare/head
 msg=${msg:-/var/mailout/msg} #default message
 [ $debug ] && echo "message file = $msg" >&2
@@ -140,14 +140,14 @@ gawk -v boundary=$boundary -v r=$r -v test=$test -v verbose=$verbose -v debug=$d
 		close(">'$email'")
 		while ((getline msg <"'$head'" ) > 0){
 			# mailmerge email address into header
-			gsub("<boundary>",boundary,msg)
 			gsub("<rcpt>",rcpt,msg)
+			gsub("<boundary>",boundary,msg)
 			print msg >>"'$email'"
 		} close("'$head'")
 		while ((getline msg <"'$txt'" ) > 0){
 			# mailmerge email address into text message
 			gsub("<boundary>",boundary,msg)
-			gsub("<rcpt>",rcpt,msg)
+			gsub("<firstname>",n[2],msg)
 			print msg >>"'$email'"
 		} close("'$txt'")
 		while ((getline msg <"'$msg'" ) > 0){
