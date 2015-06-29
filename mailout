@@ -1,7 +1,7 @@
-# $Id: mailout,v 1.39 2015/06/29 18:39:30 fulford Exp $
+# $Id: mailout,v 1.40 2015/06/29 18:51:28 fulford Exp fulford $
 # $Source: /src/merlin/usr/local/etc/RCS/mailout,v $
-# $Revision: 1.39 $
-# $Date: 2015/06/29 18:39:30 $
+# $Revision: 1.40 $
+# $Date: 2015/06/29 18:51:28 $
 # Copyright (c) 2013 Clifford W Fulford.
 # Licensed for public use under the LGPL.
 # For assistance contact fulford@fulford.net 0709 229 5385
@@ -72,8 +72,12 @@ tdir=`dirname $email`
 [ -f $log ] || touch $log
 
 # check data and message files are readable
-if [ ! -r "$data" -o ! -r "$msg" ];then
+if [ ! -r "$data" -o ! -r "$msg" -o ! -r "$txt"  ];then
 	[ ! -r "$data" ] && echo "$cmd: data file $data not found" >&2
+	[ ! -r "$txt" ] && {
+		echo "$cmd: message file $txt not found" >&2
+	 	echo "Set a text message file in $config " >&2
+	}
 	[ ! -r "$msg" ] && {
 		echo "$cmd: message file $msg not found" >&2
 	 	echo "Set a message file in $config or on command line" >&2
@@ -82,7 +86,7 @@ if [ ! -r "$data" -o ! -r "$msg" ];then
 	exit 1
 fi
 [ $debug ] && { echo "$data & $msg found">&2; read ;}
-gawk -v r=$r -v test=$test -v verbose=$verbose -v debug=$debug -v r=$r -v xtract=$xtract -v tstrcpt=$tstrcpt   -F, '{ 
+gawk -v r=$r -v test=$test -v verbose=$verbose -v debug=$debug -v xtract=$xtract -v tstrcpt=$tstrcpt -v txt=$txt  -F, '{ 
 	if($1 !~ /Authority/ && r > 0 && $1 !~ /^#/){
 		if(debug) print "count = " r >"/dev/stderr"
 			
