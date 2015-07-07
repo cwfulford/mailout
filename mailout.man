@@ -93,7 +93,9 @@ as are the strings that are to be substituted in the message file, ie.
 .LP
 The \fIfrom\fR address is also hardwired.
 .SH FILES
-.IR /usr/local/mailout.cf ,
-.IR /usr/local/mailout.xcld .
+.IR /usr/local/etc/mailout.cf ,
+.IR /var/mailout/data.csv ,
+.IR /var/mailout/deleted.csv ,
+.IR /var/mailout/mailout.xcld .
 .SH AUTHOR
 Clifford W Fulford, City Linux. Contact fulford@fulford.net or +44 (0)709 229 5385.
