@@ -1,8 +1,8 @@
 <pre>
 
-# $Id: mailout.cf,v 1.12 2015/06/29 18:56:45 fulford Exp $
+# $Id: mailout.cf,v 1.13 2015/09/08 11:29:58 fulford Exp $
 # $Source: /src/merlin/usr/local/etc/RCS/mailout.cf,v $
-# $Revision: 1.12 $
+# $Revision: 1.13 $
 # Author C W Fulford.
 # Copyright 2013 (c) C W Fulford. All rights reserved.
 # For assistance contact fulford@fulford.net 0709 229 5385
@@ -10,6 +10,7 @@
 exclude=/var/mailout/mailout.xcld
 data=/var/mailout/data.csv
 head=/home/fulford/fcl/ads/flare/head
+logdir=/var/log/mailout
 msg=/home/fulford/fcl/ads/flare/msg150625.htm
 txt=/home/fulford/fcl/ads/flare/msg150625.txt
 tstrcpt=fulford@fulford.net

@@ -1,210 +1,197 @@
+<h2 id="heading1">NAME</h2>
+<p class="indent">
+<b><a href="./scripts.php?script=mailout">mailout</a></b>
+- sends personalised html email to a number of recipients.
+</p>
+<h2 id="heading2">SYNOPSIS</h2>
+<p class="indent">
 
-<p><a href="#heading1">NAME</a><br/>
-<a href="#heading2">SYNOPSIS</a><br/>
-<a href="#heading3">AVAILABILITY</a><br/>
-<a href="#heading4">DESCRIPTION</a><br/>
-<a href="#heading5">OPTIONS</a><br/>
-<a href="#heading6">EXAMPLES</a><br/>
-<a href="#heading7">BUGS</a><br/>
-<a href="#heading8">FILES</a><br/>
-<a href="#heading9">AUTHOR</a><br/>
+<b><a href="./scripts.php?script=mailout">mailout</a></b>
+ [
+<b>-c </b>
+<i>&lt;config_file&gt;</i>
+] [
+<b>-d</b>
+]
+[
+<b>-n </b>
+<i># records</i>
+] [
+<b>-t</b>
+] [
+<b>-v</b>
+] [
+<b>-x</b>
+]
+[
+<b>-X </b>
+<i>&lt;exclude_file&gt;</i>
+]
+[
+<i>&lt;message_file&gt;</i>
+]
+</p>
+<h2 id="heading3">AVAILABILITY</h2>
+<p class="indent">
+<b><a href="./scripts.php?script=mailout">mailout</a></b>
+is a Bourne shell script and should work equally well on all versions of UNIX,
+Linux and Mac OS X.
+</p>
+<h2 id="heading4">DESCRIPTION</h2>
+<p class="indent">
+The script
+<b><a href="./scripts.php?script=mailout">mailout</a> </b>
+extracts names and email addresses from a csv data file and uses
+<b>awk</b>
+to generate personalised html email to each recipient in the list.
+<b>Sendmail</b>
+is is used as the 
+<i>MUA</i>
+ and the 
+<i>"from"</i>
+ address is set in the
+script.
+</p>
+<p class="indent">
+If the 
+<b>-n </b>
+option is used (see options below) the number of emails may be restricted.
+</p>
+<p class="indent">
+The script keeps track of the recipients to whom the message has been sent
+and the next time it is run skips those records and sends messages 
+to new addresses only.
+</p>
+<p class="indent">
+The default data file is 
+<i>/var/<a href="./scripts.php?script=mailout">mailout</a>/data.csv</i>
+. This may be changed
+in the configuration file.
+</p>
+<p class="indent">
+The default message file is 
+<i>/var/<a href="./scripts.php?script=mailout">mailout</a>/msg</i>
+ but this is normally 
+changed by specifying the file on the command line. 
+<i>Mailout</i>
+ does not
+care if the message is in html format or not.
+</p>
+<h2 id="heading5">OPTIONS</h2>
+<p class="indent">
+</p>
+<p class="indent">
+
+<b>-c </b>
+<i>&lt;config_file&gt;</i>
+
+The default configuration file is 
+<i>/usr/local/etc/<a href="./scripts.php?script=mailout.cf">mailout.cf</a></i>
+, this
+may be changed on the command line by using the 
+<b>-c</b>&nbsp;&nbsp;&nbsp;
+ option.
+</p>
+<p class="indent">
+<b>-d</b>&nbsp;&nbsp;&nbsp;
+Set 
+<i>debug</i>
+ mode on. The script will report its progress to screen
+as it runs. 
+</p>
+<p class="indent">
+<b>-t</b>&nbsp;&nbsp;&nbsp;
+Sets 
+<i>test</i>
+ mode. The script runs through all its usual actions and reports
+recipient details as it would normally but the email is actually sent to a 
+single email address under the control of the user. This is to allow
+verification by inspection of the resulting message content.
+</p>
+<p class="indent">
+<b>-v</b>&nbsp;&nbsp;&nbsp;
+Set the operation mode of the script to 
+<i>verbose</i>.
+In
+<i>verbose</i>
+mode 
+<b><a href="./scripts.php?script=mailout">mailout</a></b>
+ will echo to screen the recipient details for each
+message sent.
+</p>
+<p class="indent">
+<b>-x</b>&nbsp;&nbsp;&nbsp;
+With the 
+<b>-x</b>&nbsp;&nbsp;&nbsp;
+ option set the recipients that would otherwise be contacted
+are extracted and reported to screen but no mail is sent. This is useful
+where is desirable to to check the potential recipients or cross reference
+with other mailouts before committing to sending the message.
+</p>
+<p class="indent">
+
+<b>-X </b>
+<i>&lt;exclude_file&gt;</i>
+
+The 
+<b>-X</b>&nbsp;&nbsp;&nbsp;
+ option allows an exclude file to be specified on the command line.
+The default exclude file is 
+<i>/usr/local/etc/mailout.xcld</i>
+, although this
+may be changed using the configuration file. The exclude files are lists of mail
+addresses and mail domains to which mail should not be sent. Both files will
+be consulted if the 
+<b>-X </b>
+<i>&lt;exclude_file&gt;</i>
+ option is used.
 
 </p>
-<hr/>
+<h2 id="heading6">EXAMPLES</h2>
+<p class="indent">
 
+</p><div class="cmdline">
+<pre>
+mailout -n 20 -v  ad010429.html
+</pre></div>
+<p class="indent">
+</p>
+<p class="indent">
+Send personalised email using the file ad010429.html to the next 20
+recipients from the 
+<i>/var/mailout/data.csv</i>
+.
+</p>
+<p class="indent">
+List the recipients to screen as each email is sent.
+</p>
+<h2 id="heading8">BUGS</h2>
+<p class="indent">
+Not really bugs but the script has very little input error checking.
+</p>
+<p class="indent">
+The fields for the recipient names and email addresses are hardwired
+as are the strings that are to be substituted in the message file, ie. 
 
-<h2 id="heading1">NAME
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em"><b><a href="./scripts.php?script=mailout">mailout</a></b>
-- sends personalised html email to a number of
-recipients.</p>
-
-<h2 id="heading2">SYNOPSIS
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em"><b><a href="./scripts.php?script=mailout">mailout</a></b>
-[<b>-c</b> <i>&lt;config_file&gt;</i>] [<b>-d</b>]
-[<b>-n</b> <i># records</i>] [<b>-t</b>] [<b>-v</b>]
-[<b>-x</b>] [<b>-X</b> <i>&lt;exclude_file&gt;</i>]
-[<i>&lt;message_file&gt;</i>]</p>
-
-<h2 id="heading3">AVAILABILITY
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em"><b><a href="./scripts.php?script=mailout">mailout</a></b>
-is a Bourne shell script and should work equally well on all
-versions of UNIX, Linux and Mac OS X.</p>
-
-<h2 id="heading4">DESCRIPTION
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em">The script
-<b><a href="./scripts.php?script=mailout">mailout</a></b> extracts names and email addresses from a csv
-data file and uses <b>awk</b> to generate personalised html
-email to each recipient in the list. <b>Sendmail</b> is is
-used as the <i>MUA</i> and the <i>&quot;from&quot;</i>
-address is set in the script.</p>
-
-<p style="margin-left:11%; margin-top: 1em">If the
-<b>-n</b> option is used (see options below) the number of
-emails may be restricted.</p>
-
-<p style="margin-left:11%; margin-top: 1em">The script
-keeps track of the recipients to whom the message has been
-sent and the next time it is run skips those records and
-sends messages to new addresses only.</p>
-
-<p style="margin-left:11%; margin-top: 1em">The default
-data file is <i>/var/<a href="./scripts.php?script=mailout">mailout</a>/data.csv</i>. This may be
-changed in the configuration file.</p>
-
-<p style="margin-left:11%; margin-top: 1em">The default
-message file is <i>/var/<a href="./scripts.php?script=mailout">mailout</a>/msg</i> but this is normally
-changed by specifying the file on the command line.
-<i>Mailout</i> does not care if the message is in html
-format or not.</p>
-
-<h2 id="heading5">OPTIONS
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em"><b>-c</b>
-<i>&lt;config_file&gt;</i></p>
-
-<p style="margin-left:18%;">The default configuration file
-is <i>/usr/local/etc/<a href="./scripts.php?script=mailout.cf">mailout.cf</a></i>, this may be changed on
-the command line by using the <b>-c</b> option.</p>
-
-<table width="100%" border="0" rules="none" frame="void"
-       cellspacing="0" cellpadding="0">
-<colgroup><col width="11%"></col>
-<col width="3%"></col>
-<col width="4%" class="center"></col>
-<col width="82%"></col>
-</colgroup>
-<tr valign="top" align="left">
-<td></td>
-<td>
-
-
-<p><b>-d</b></p></td>
-<td></td>
-<td>
-
-
-<p>Set <i>debug</i> mode on. The script will report its
-progress to screen as it runs.</p></td></tr>
-<tr valign="top" align="left">
-<td></td>
-<td>
-
-
-<p><b>-t</b></p></td>
-<td></td>
-<td>
-
-
-<p>Sets <i>test</i> mode. The script runs through all its
-usual actions and reports recipient details as it would
-normally but the email is actually sent to a single email
-address under the control of the user. This is to allow
-verification by inspection of the resulting message
-content.</p> </td></tr>
-<tr valign="top" align="left">
-<td></td>
-<td>
-
-
-<p><b>-v</b></p></td>
-<td></td>
-<td>
-
-
-<p>Set the operation mode of the script to <i>verbose</i>.
-In <i>verbose</i> mode <b><a href="./scripts.php?script=mailout">mailout</a></b> will echo to screen
-the recipient details for each message sent.</p></td></tr>
-<tr valign="top" align="left">
-<td></td>
-<td>
-
-
-<p><b>-x</b></p></td>
-<td></td>
-<td>
-
-
-<p>With the <b>-x</b> option set the recipients that would
-otherwise be contacted are extracted and reported to screen
-but no mail is sent. This is useful where is desirable to to
-check the potential recipients or cross reference with other
-<a href="./scripts.php?script=mailout">mailout</a>s before committing to sending the message.</p></td></tr>
-</table>
-
-<p style="margin-left:11%;"><b>-X</b>
-<i>&lt;exclude_file&gt;</i></p>
-
-<p style="margin-left:18%;">The <b>-X</b> option allows an
-exclude file to be specified on the command line. The
-default exclude file is <i>/usr/local/etc/mailout.xcld</i>,
-although this may be changed using the configuration file.
-The exclude files are lists of mail addresses and mail
-domains to which mail should not be sent. Both files will be
-consulted if the <b>-X</b> <i>&lt;exclude_file&gt;</i>
-option is used.</p>
-
-<h2 id="heading6">EXAMPLES
-</h2>
-
-
-<pre style="margin-left:22%; margin-top: 1em"><a href="./scripts.php?script=mailout">mailout</a> -n 20 -v  ad010429.html</pre>
-
-
-<p style="margin-left:11%; margin-top: 1em">Send
-personalised email using the file ad010429.html to the next
-20 recipients from the <i>/var/<a href="./scripts.php?script=mailout">mailout</a>/data.csv</i>.</p>
-
-<p style="margin-left:11%; margin-top: 1em">List the
-recipients to screen as each email is sent.</p>
-
-<h2 id="heading7">BUGS
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em">Not really bugs
-but the script has very little input error checking.</p>
-
-<p style="margin-left:11%; margin-top: 1em">The fields for
-the recipient names and email addresses are hardwired as are
-the strings that are to be substituted in the message file,
-ie. <i>&quot;rcpt&quot;</i> and
-&quot;<i>firstname</i>&quot;.</p>
-
-<p style="margin-left:11%; margin-top: 1em">The <i>from</i>
-address is also hardwired.</p>
-
-<h2 id="heading8">FILES
-</h2>
-
-
-
-<p style="margin-left:11%; margin-top: 1em"><i>/usr/local/etc/<a href="./scripts.php?script=mailout.cf">mailout.cf</a></i>,
+<i>"rcpt"</i>
+ and "
+<i>firstname</i>
+".
+</p>
+<p class="indent">
+The 
+<i>from</i>
+ address is also hardwired.
+</p>
+<h2 id="heading7">FILES</h2>
+<p class="indent">
+<i>/usr/local/etc/<a href="./scripts.php?script=mailout.cf">mailout.cf</a></i>,
 <i>/var/mailout/data.csv</i>,
 <i>/var/mailout/deleted.csv</i>,
-<i>/var/mailout/mailout.xcld</i>.</p>
-
-<h2 id="heading9">AUTHOR
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em">Clifford W
-Fulford, <a href="http://www.citylinux.com"
-title="Go to the City Linux homepage">
-City Linux
-</a>. Contact <a href="mailto:fulford@fulford.net" title="Send mail to Clifford W Fulford">fulford@fulford.net</a> or +44
-(0)709 229 5385.</p>
-<hr/>
+<i>/var/mailout/mailout.xcld</i>.
+</p>
+<h2 id="heading10">AUTHOR</h2>
+<p class="indent">
+Clifford W Fulford, City Linux. Contact fulford@fulford.net or +44 (0)709 229 5385.
+</p>
+	
